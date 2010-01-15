@@ -95,6 +95,8 @@ sub rand_sentence {
 
 =head1 NAME
 
+Acme::Lingua::ZH::Remix - The Chinese sentence generator.
+
 =head1 SYNOPSIS
 
     use Acme::Lingua::ZH::Remix;
