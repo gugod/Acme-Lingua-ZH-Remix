@@ -13,38 +13,47 @@ sub import {
     }
 }
 
-
 my @phrase_db;
 my %phrase;
 
 sub init_phrase {
     my $corpus = shift;
-    $corpus =~ s/\n([^\n])/$1/gs;
+
+    # Squeeze whitespaces
+    $corpus =~ s/(\s|　)*//gs;
+
+    # Ignore certain punctuations
     $corpus =~ s/——//gs;
 
+    my @x = split /(?:（(.+?)）|：?「(.+?)」|〔(.+?)〕|“(.+?)”)/, $corpus;
     @phrase_db =
         uniq sort
         map {
             s/^(，|。|？|\s)+//;
             $_;
-        } map {
+        } grep /\S/, map {
             @_ = ();
-            s/(（.+?）|「.+?」|〔.+?〕|“.+?”)//gsm;
-            push @_, $1;
+            # s/(.+?(?:，|。|？)+)//gsm;
+            my @x = split /(，|。|？)/;
+            while(@x) {
+                my $s = shift @x;
+                my $p = shift @x;
 
-            s/(.+?(?:，|。|？)+)//gsm;
-            push @_, $1;
+                push @_, "$s$p";
+            }
 
-            # Discard un-reconized phrases left in $_
             @_;
-        } map {
+        } grep /\S/, map {
             s/^\s+//;
             s/\s+$//;
             s/^(.+?) //;
             $_;
-        } split /\n+/, $corpus;
+        } @x;
+
+    %phrase = {};
 
     for (@phrase_db) {
+        # say $_;
         my $p = substr($_, -1);
         push @{$phrase{$p} ||=[]}, $_;
     }
@@ -61,6 +70,11 @@ sub rand_phrase {
 }
 
 sub rand_sentence {
+    unless (%phrase) {
+        local $/ = undef;
+        init_phrase(<DATA>);
+    }
+
     my $str = "";
 
     while($str eq "") {
@@ -92,12 +106,6 @@ sub rand_sentence {
     }
 
     return $str;
-}
-
-{
-    local $/ = undef;
-    my $corpus = <DATA>;
-    init_phrase($corpus);
 }
 
 1;
