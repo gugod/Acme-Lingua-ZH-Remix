@@ -1,3 +1,6 @@
+0.12:
+- Improve init_phrase to extract text from be project gutenberg better
+
 0.11:
 - Use a public domain corpus by default
 

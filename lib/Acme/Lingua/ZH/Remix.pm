@@ -2,7 +2,7 @@ package Acme::Lingua::ZH::Remix;
 use common::sense;
 use List::MoreUtils qw(uniq);
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 
 sub import {
     my $pkg = (caller)[0];
