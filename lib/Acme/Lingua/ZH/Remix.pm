@@ -25,18 +25,18 @@ sub init_phrase {
     $corpus =~ s/(\s|　)*//gs;
 
     # Ignore certain punctuations
-    $corpus =~ s/——//gs;
+    $corpus =~ s/(——|──)//gs;
 
     my @x = split /(?:（(.+?)）|：?「(.+?)」|〔(.+?)〕|“(.+?)”)/, $corpus;
     @phrase_db =
         uniq sort
         map {
-            s/^(，|。|？|\s)+//;
+            s/^(，|。|？|！|\s)+//;
             $_;
         } grep /\S/, map {
             @_ = ();
             # s/(.+?(?:，|。|？)+)//gsm;
-            my @x = split /(，|。|？)/;
+            my @x = split /(，|。|？|！)/;
             while(@x) {
                 my $s = shift @x;
                 my $p = shift @x;
@@ -66,6 +66,11 @@ sub phrase_ratio {
     return @{$phrase{$type}} / @phrase_db
 }
 
+sub random(@_) {
+    my $n = $#_;
+    return $_[ int(rand($n)) ];
+}
+
 sub rand_phrase {
     my $type = shift;
     $phrase{ $type }[int rand @{$phrase{ $type }}];
@@ -78,20 +83,12 @@ sub rand_sentence {
     }
 
     my $str = "";
-
     while($str eq "") {
-        for ('」',  '，' ,'，' , '）', '，') {
-            $str .= rand_phrase($_) if rand() < phrase_ratio($_);
-        }
+        my $x = random('，', '」', '）', '/');
+        $str .= rand_phrase($x) while rand() < phrase_ratio($x);
     }
 
-    my $ending;
-    if (rand > 0.5) {
-        $ending = rand_phrase("。")
-    }
-    else {
-        $ending = rand_phrase("？");
-    }
+    my $ending = rand_phrase(random(qw/。 ！ ？/));
 
     unless($ending) {
         $str =~ s/，$//;
