@@ -159,6 +159,10 @@ See L<http://www.perl.com/perl/misc/Artistic.html>
 # http://zh.wikisource.org/zh-hant/%E5%BF%98%E4%B8%8D%E4%BA%86%E7%9A%84%E9%81%8E%E5%B9%B4
 
 __DATA__
+#c9s
+
+還不賴，還不賴。還不賴！還不賴？
+
 # 前進
 
 在一個晚上，是黑暗的晚上，暗黑的氣氛，濃濃密密把空間充塞著，不讓星星的光明，漏射到地上。那黑暗雖在幾百層的地底，也是經驗不到，是未曾有過駭人的黑暗。
