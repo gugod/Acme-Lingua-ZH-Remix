@@ -1,3 +1,7 @@
+0.14:
+- Add c9s as corpus author
+- small rewrite of the generating algorithm.
+
 0.13:
 - The default corpus is changed to the texts from a Taiwan writer.
 
