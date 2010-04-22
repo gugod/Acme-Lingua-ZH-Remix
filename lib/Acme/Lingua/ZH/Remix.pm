@@ -71,8 +71,7 @@ sub phrase_ratio {
 }
 
 sub random(@_) {
-    my $n = $#_;
-    return $_[ int(rand($n)) ];
+    return $_[ rand @_ ];
 }
 
 sub rand_phrase {
