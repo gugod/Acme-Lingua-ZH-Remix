@@ -1,25 +1,71 @@
 package Acme::Lingua::ZH::Remix;
+our $VERSION = "0.14";
+
+=head1 NAME
+
+Acme::Lingua::ZH::Remix - The Chinese sentence generator.
+
+=head1 SYNOPSIS
+
+    use Acme::Lingua::ZH::Remix;
+
+    rand_sentence;
+
+=head1 DESCRIPTION
+
+The exported function C<rand_sentence> returns a string of one sentence
+of Chinese like:
+
+    真是完全失敗，孩子！怎麼不動了呢？
+
+It uses the corpus data from Project Gutenberg by default. All
+generate sentences are remixes of the corpus.
+
+You can feed you own corpus data with `init_phrase` function:
+
+    Acme::Lingua::ZH::Remix::init_phrase($my_corpus);
+    say rand_santence; # based on $my_corpus
+
+This will effectively clear the default corpus, and any other corpus
+fed into it before. The corpus should use full-width punction
+characters.
+
+Warning: The C<rand_sentence> function has non-zero chance entering an
+infinte loop.
+
+=cut
+
+use Moose;
 use common::sense;
 use List::MoreUtils qw(uniq);
 
-our $VERSION = "0.14";
+has phrases => (
+    is => "rw",
+    isa => "ArrayRef",
+    lazy_build => 1
+);
 
-sub import {
-    my $pkg = (caller)[0];
-    {
-        no strict 'refs';
-        *{$pkg . '::rand_sentence'} = \&rand_sentence
-            if not defined &{$pkg . '::rand_sentence'};
-    }
+sub _build_phrases {
+    my ($self) = @_;
+    local $/ = undef;
+    return [$self->split_corpus(<DATA>)];
 }
 
+sub random(@) { $_[ rand @_ ] }
 
-my %phrase;
-my $phrase_count;
+=head1 METHODS
 
-sub init_phrase {
-    my $corpus = shift;
-    my @phrase_db;
+=head2 split_corpus($corpus_text)
+
+Takes a scalar, returns an list.
+
+This is an utility method that does not change the internal state of
+the topic object.
+
+=cut
+
+sub split_corpus {
+    my ($self, $corpus) = @_;
 
     $corpus =~ s/^\#.*$//gm;
 
@@ -29,54 +75,51 @@ sub init_phrase {
     # Ignore certain punctuations
     $corpus =~ s/(——|──)//gs;
 
-    my @x = split /(?:（(.+?)）|：?「(.+?)」|〔(.+?)〕|“(.+?)”)/, $corpus;
-    @phrase_db =
-        uniq sort
+    my @xc = split /(?:（(.+?)）|：?「(.+?)」|〔(.+?)〕|“(.+?)”)/, $corpus;
+    my @phrases = uniq sort grep /.(，|。|？|！)$/,
         map {
-            s/^(，|。|？|！|\s)+//;
-            $_;
-        } grep /\S/, map {
-            @_ = ();
-            # s/(.+?(?:，|。|？)+)//gsm;
-            my @x = split /(，|。|？|！)/;
-            while(@x) {
+            my @x = split /(，|。|？|！)/, $_;
+            my @r = ();
+            while (@x) {
                 my $s = shift @x;
                 my $p = shift @x;
 
-                push @_, "$s$p";
+                $s =~ s/^(，|。|？|！|\s)+//;
+                push @r, "$s$p";
             }
-
-            @_;
-        } grep /\S/, map {
+            @r;
+        } map {
             s/^\s+//;
             s/\s+$//;
             s/^(.+?) //;
             $_;
-        } @x;
+        } @xc;
 
-    %phrase = {};
+    return @phrases;
+}
 
-    for (@phrase_db) {
-        # say $_;
+my %phrase;
+my $phrase_count;
+
+sub init_phrase {
+    my $corpus = shift;
+    my @phrases = split_corpus(undef, $corpus);
+    $phrase_count = scalar @phrases;
+
+    for (@phrases) {
         my $p = substr($_, -1);
-        push @{$phrase{$p} ||=[]}, $_;
+        push @{$phrase{$p} ||=[]}, \$_;
     }
-
-    $phrase_count = scalar @phrase_db;
 }
 
 sub phrase_ratio {
     my $type = shift;
-    return @{$phrase{$type}} / $phrase_count;
-}
-
-sub random(@_) {
-    return $_[ rand @_ ];
+    return @{$phrase{$type}||=[]} / $phrase_count;
 }
 
 sub rand_phrase {
     my $type = shift;
-    $phrase{ $type }[int rand @{$phrase{ $type }}];
+    return ${ random(@{ $phrase{$type}||=[] }) };
 }
 
 sub rand_sentence {
@@ -111,38 +154,6 @@ sub rand_sentence {
 }
 
 1;
-
-=head1 NAME
-
-Acme::Lingua::ZH::Remix - The Chinese sentence generator.
-
-=head1 SYNOPSIS
-
-    use Acme::Lingua::ZH::Remix;
-
-    rand_sentence;
-
-=head1 DESCRIPTION
-
-The exported function C<rand_sentence> returns a string of one sentence
-of Chinese like:
-
-    真是完全失敗，孩子！怎麼不動了呢？
-
-It uses the corpus data from Project Gutenberg by default. All
-generate sentences are remixes of the corpus.
-
-You can feed you own corpus data with `init_phrase` function:
-
-    Acme::Lingua::ZH::Remix::init_phrase($my_corpus);
-    say rand_santence; # based on $my_corpus
-
-This will effectively clear the default corpus, and any other corpus
-fed into it before. The corpus should use full-width punction
-characters.
-
-Warning: The C<rand_sentence> function has non-zero chance entering an
-infinte loop.
 
 =head1 COPYRIGHT
 
