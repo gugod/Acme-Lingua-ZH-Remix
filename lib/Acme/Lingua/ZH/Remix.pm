@@ -13,11 +13,13 @@ sub import {
     }
 }
 
-my @phrase_db;
+
 my %phrase;
+my $phrase_count;
 
 sub init_phrase {
     my $corpus = shift;
+    my @phrase_db;
 
     $corpus =~ s/^\#.*$//gm;
 
@@ -59,11 +61,13 @@ sub init_phrase {
         my $p = substr($_, -1);
         push @{$phrase{$p} ||=[]}, $_;
     }
+
+    $phrase_count = scalar @phrase_db;
 }
 
 sub phrase_ratio {
     my $type = shift;
-    return @{$phrase{$type}} / @phrase_db
+    return @{$phrase{$type}} / $phrase_count;
 }
 
 sub random(@_) {
