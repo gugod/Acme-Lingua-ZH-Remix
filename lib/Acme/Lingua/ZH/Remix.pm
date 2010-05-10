@@ -20,6 +20,12 @@ Acme::Lingua::ZH::Remix - The Chinese sentence generator.
 
 =head1 DESCRIPTION
 
+Because lipsum is not funny enough, that is the reason to write this
+module.
+
+This module is a L<Moose> based OO module. You create an instance of
+it with C<new> method, and then invoke methods on the returned object.
+
 The C<random_sentence> method returns a string of one sentence
 of Chinese like:
 

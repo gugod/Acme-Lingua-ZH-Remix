@@ -1,3 +1,6 @@
+0.90:
+- Make it a Moose-based module. Deprecate all old usages.
+
 0.14:
 - Add c9s as corpus author
 - small rewrite of the generating algorithm.
