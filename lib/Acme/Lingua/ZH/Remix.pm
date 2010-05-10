@@ -146,7 +146,7 @@ sub feed {
     }
 
     $self->phrases(merge($self->phrases, \%phrase));
-    $self->clear_phrase_count;
+    $self->phrase_count( $self->_build_phrase_count );
 
     return $self;
 }
@@ -154,7 +154,9 @@ sub feed {
 sub phrase_ratio {
     my $self = shift;
     my $type = shift;
-    return @{$self->phrases->{$type}||=[]} / $self->phrase_count;
+    my $phrases = $self->phrases->{$type}||=[];
+    my $count   = $self->phrase_count;
+    return @{$phrases} / $count;
 }
 
 sub random_phrase {
