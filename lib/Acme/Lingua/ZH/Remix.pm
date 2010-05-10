@@ -1,5 +1,5 @@
 package Acme::Lingua::ZH::Remix;
-our $VERSION = "1.0";
+our $VERSION = "0.90";
 
 =pod
 
@@ -157,7 +157,7 @@ sub random_phrase {
     return ${ random(@{ $self->phrases->{$type}||=[] }) };
 }
 
-=head2 random_sentence()
+=head2 random_sentence
 
 Instance method. Takes no arguments, returns a scalar.
 
