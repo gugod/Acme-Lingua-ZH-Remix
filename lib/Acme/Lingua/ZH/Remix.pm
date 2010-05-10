@@ -40,8 +40,8 @@ The corpus should use full-width punctuation characters.
 
 =cut
 
-use Moose;
 use utf8;
+use Moose;
 use List::MoreUtils qw(uniq);
 use Hash::Merge qw(merge);
 
@@ -126,14 +126,13 @@ sub feed {
     my %phrase;
     my @phrases = $self->split_corpus($corpus);
 
-    $self->phrase_count($self->phrase_count + @phrases);
-
     for (@phrases) {
         my $p = substr($_, -1);
         push @{$phrase{$p} ||=[]}, \$_;
     }
 
     $self->phrases(merge($self->phrases, \%phrase));
+    $self->clear_phrase_count;
 }
 
 sub phrase_ratio {

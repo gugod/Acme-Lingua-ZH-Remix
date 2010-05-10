@@ -15,6 +15,8 @@ subtest 'split_corpus method' => sub {
 subtest 'a simple one' => sub {
     my $r = Acme::Lingua::ZH::Remix->new;
     my $s = $r->random_sentence;
+
+    ok($r->phrase_count > 4, "phrase_count seems to be correct");
     ok $s, "something is generated.";
     done_testing;
 };
@@ -22,7 +24,10 @@ subtest 'a simple one' => sub {
 subtest 'custom phrase materials' => sub {
     my $r = Acme::Lingua::ZH::Remix->new;
     $r->feed("還不賴！ 總之， 很好。 如何？");
+
+    is ($r->phrase_count, 4, "phrase_count is correct");
     ok $r->random_sentence, "something is generated.";
+
     done_testing;
 };
 
