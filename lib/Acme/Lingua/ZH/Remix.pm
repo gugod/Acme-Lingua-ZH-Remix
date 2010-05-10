@@ -1,5 +1,5 @@
 package Acme::Lingua::ZH::Remix;
-our $VERSION = "0.14";
+our $VERSION = "1.0";
 
 =pod
 
@@ -119,6 +119,14 @@ sub split_corpus {
     return @phrases;
 }
 
+=head2 feed($corpus_text)
+
+Instance method. Takes a scalar, return the topic object.
+
+Merge C<$corpus_text> into the internal phrases corpus of the object.
+
+=cut
+
 sub feed {
     my $self   = shift;
     my $corpus = shift;
@@ -133,6 +141,8 @@ sub feed {
 
     $self->phrases(merge($self->phrases, \%phrase));
     $self->clear_phrase_count;
+
+    return $self;
 }
 
 sub phrase_ratio {
@@ -146,6 +156,14 @@ sub random_phrase {
     my $type = shift;
     return ${ random(@{ $self->phrases->{$type}||=[] }) };
 }
+
+=head2 random_sentence()
+
+Instance method. Takes no arguments, returns a scalar.
+
+The returned scalar is the generate sentence.
+
+=cut
 
 sub random_sentence {
     my $self = shift;
