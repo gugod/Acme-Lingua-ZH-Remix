@@ -1,6 +1,10 @@
 package Acme::Lingua::ZH::Remix;
 our $VERSION = "0.14";
 
+=pod
+
+=encoding utf8
+
 =head1 NAME
 
 Acme::Lingua::ZH::Remix - The Chinese sentence generator.
@@ -9,11 +13,14 @@ Acme::Lingua::ZH::Remix - The Chinese sentence generator.
 
     use Acme::Lingua::ZH::Remix;
 
-    rand_sentence;
+    my $x = Acme::Lingua::ZH::Remix->new;
+
+    # Generate a random sentance
+    say $x->random_sentence;
 
 =head1 DESCRIPTION
 
-The exported function C<rand_sentence> returns a string of one sentence
+The C<random_sentence> method returns a string of one sentence
 of Chinese like:
 
     真是完全失敗，孩子！怎麼不動了呢？
@@ -21,34 +28,47 @@ of Chinese like:
 It uses the corpus data from Project Gutenberg by default. All
 generate sentences are remixes of the corpus.
 
-You can feed you own corpus data with `init_phrase` function:
+You can feed you own corpus data to the `feed` method:
 
-    Acme::Lingua::ZH::Remix::init_phrase($my_corpus);
-    say rand_santence; # based on $my_corpus
+    my $x = Acme::Lingua::ZH::Remix->new;
+    $x->feed($my_corpus);
 
-This will effectively clear the default corpus, and any other corpus
-fed into it before. The corpus should use full-width punction
-characters.
+    # Say something based on $my_corpus
+    say $x->random_santence;
 
-Warning: The C<rand_sentence> function has non-zero chance entering an
-infinte loop.
+The corpus should use full-width punctuation characters.
 
 =cut
 
 use Moose;
-use common::sense;
+use utf8;
 use List::MoreUtils qw(uniq);
+use Hash::Merge qw(merge);
 
-has phrases => (
-    is => "rw",
-    isa => "ArrayRef",
-    lazy_build => 1
-);
+has phrases      => (is => "rw", isa => "HashRef", lazy_build => 1);
+has phrase_count => (is => "rw", isa => "Int",     lazy_build => 1);
 
 sub _build_phrases {
-    my ($self) = @_;
-    local $/ = undef;
-    return [$self->split_corpus(<DATA>)];
+    my $self   = shift;
+    local $/   = undef;
+    my $corpus = <DATA>;
+    my %phrase;
+    my @phrases = $self->split_corpus($corpus);
+    for (@phrases) {
+        my $p = substr($_, -1);
+        push @{$phrase{$p} ||=[]}, \$_;
+    }
+    return \%phrase;
+}
+
+sub _build_phrase_count {
+    my $self = shift;
+    my %p = %{$self->phrases};
+    my $count = 0;
+    for(keys %p) {
+        $count += scalar @{$p{$_}};
+    }
+    return $count;
 }
 
 sub random(@) { $_[ rand @_ ] }
@@ -66,6 +86,7 @@ the topic object.
 
 sub split_corpus {
     my ($self, $corpus) = @_;
+    return () unless $corpus;
 
     $corpus =~ s/^\#.*$//gm;
 
@@ -82,7 +103,7 @@ sub split_corpus {
             my @r = ();
             while (@x) {
                 my $s = shift @x;
-                my $p = shift @x;
+                my $p = shift @x or next;
 
                 $s =~ s/^(，|。|？|！|\s)+//;
                 push @r, "$s$p";
@@ -93,48 +114,50 @@ sub split_corpus {
             s/\s+$//;
             s/^(.+?) //;
             $_;
-        } @xc;
+        } grep { $_ } @xc;
 
     return @phrases;
 }
 
-my %phrase;
-my $phrase_count;
-
-sub init_phrase {
+sub feed {
+    my $self   = shift;
     my $corpus = shift;
-    my @phrases = split_corpus(undef, $corpus);
-    $phrase_count = scalar @phrases;
+
+    my %phrase;
+    my @phrases = $self->split_corpus($corpus);
+
+    $self->phrase_count($self->phrase_count + @phrases);
 
     for (@phrases) {
         my $p = substr($_, -1);
         push @{$phrase{$p} ||=[]}, \$_;
     }
+
+    $self->phrases(merge($self->phrases, \%phrase));
 }
 
 sub phrase_ratio {
+    my $self = shift;
     my $type = shift;
-    return @{$phrase{$type}||=[]} / $phrase_count;
+    return @{$self->phrases->{$type}||=[]} / $self->phrase_count;
 }
 
-sub rand_phrase {
+sub random_phrase {
+    my $self = shift;
     my $type = shift;
-    return ${ random(@{ $phrase{$type}||=[] }) };
+    return ${ random(@{ $self->phrases->{$type}||=[] }) };
 }
 
-sub rand_sentence {
-    unless (%phrase) {
-        local $/ = undef;
-        init_phrase(<DATA>);
-    }
+sub random_sentence {
+    my $self = shift;
 
     my $str = "";
     while($str eq "") {
         my $x = random('，', '」', '）', '/');
-        $str .= rand_phrase($x) while rand() < phrase_ratio($x);
+        $str .= $self->random_phrase($x) while rand() < $self->phrase_ratio($x);
     }
 
-    my $ending = rand_phrase(random(qw/。 ！ ？/));
+    my $ending = $self->random_phrase(random(qw/。 ！ ？/));
 
     unless($ending) {
         $str =~ s/，$//;

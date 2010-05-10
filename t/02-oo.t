@@ -14,17 +14,15 @@ subtest 'split_corpus method' => sub {
 
 subtest 'a simple one' => sub {
     my $r = Acme::Lingua::ZH::Remix->new;
-    my $s = $r->rand_sentence;
+    my $s = $r->random_sentence;
     ok $s, "something is generated.";
     done_testing;
 };
 
 subtest 'custom phrase materials' => sub {
-    plan skip_all => "not implemented";
-
     my $r = Acme::Lingua::ZH::Remix->new;
-    $r->phrases([ qw(還不賴！ 總之， 很好。 如何？) ]);
-    ok $r->rand_sentence, "something is generated.";
+    $r->feed("還不賴！ 總之， 很好。 如何？");
+    ok $r->random_sentence, "something is generated.";
     done_testing;
 };
 
