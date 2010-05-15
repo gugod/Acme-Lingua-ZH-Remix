@@ -47,7 +47,7 @@ The corpus should use full-width punctuation characters.
 =cut
 
 use utf8;
-use Moose;
+use Any::Moose;
 use List::MoreUtils qw(uniq);
 use Hash::Merge qw(merge);
 

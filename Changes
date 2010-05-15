@@ -1,3 +1,7 @@
+0.91:
+- prevent a div-by-zero exception
+- use Any::Moose instead
+
 0.90:
 - Make it a Moose-based module. Deprecate all old usages.
 
