@@ -156,7 +156,7 @@ sub phrase_ratio {
     my $type = shift;
     my $phrases = $self->phrases->{$type}||=[];
     my $count   = $self->phrase_count;
-    if ($count == 0) return 0;
+    return 0 if $count == 0;
     return @{$phrases} / $count;
 }
 
