@@ -52,7 +52,7 @@ subtest 'sentence lenth constraint' => sub {
 
         utf8::encode($s);
         ok $s, "something is generated: $s";
-        ok($l >= 5 && $l <= 8, "length constrain: 5 <= $l <= 8");
+        ok($l >= 5 && $l <= 8, "length constrain: 5 <= $l <= 8 $s");
     }
 
     done_testing;
