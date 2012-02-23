@@ -1,6 +1,6 @@
 package Acme::Lingua::ZH::Remix;
 use v5.10;
-our $VERSION = "0.93";
+our $VERSION = "0.94";
 
 =pod
 
@@ -229,7 +229,7 @@ sub random_sentence {
 
         my $p = $self->random_phrase($x);
 
-        if ($l + length($p) < $options{max}) {
+         if ($l + length($p) < $options{max}) {
             unshift @phrases, $p;
             $l += length($p);
         }

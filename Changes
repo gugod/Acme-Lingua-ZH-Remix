@@ -1,3 +1,6 @@
+0.94:
+- fix: range constranit and infinite loop
+
 0.93:
 - fix: dup phrases in a particular edge case.
 
