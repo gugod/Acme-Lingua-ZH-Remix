@@ -1,6 +1,6 @@
 package Acme::Lingua::ZH::Remix;
 use v5.10;
-our $VERSION = "0.92";
+our $VERSION = "0.93";
 
 =pod
 
@@ -222,8 +222,6 @@ sub random_sentence {
     $str = join "", @phrases;
     $str =~ s/，$//;
     $str =~ s/^「(.+)」$/$1/;
-
-    $str .= $ending;
 
     if (rand > 0.5) {
         $str =~ s/(，)……/$1/gs;

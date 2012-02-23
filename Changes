@@ -1,3 +1,6 @@
+0.93:
+- fix: dup phrases in a particular edge case.
+
 0.92:
 - random_sentence now accpets length constrain
 
