@@ -1,6 +1,6 @@
 package Acme::Lingua::ZH::Remix;
 use v5.10;
-our $VERSION = "0.91";
+our $VERSION = "0.92";
 
 =pod
 

@@ -1,3 +1,6 @@
+0.92:
+- random_sentence now accpets length constrain
+
 0.91:
 - prevent a div-by-zero exception
 - use Any::Moose instead
