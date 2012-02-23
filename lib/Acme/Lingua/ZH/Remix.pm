@@ -1,6 +1,6 @@
 package Acme::Lingua::ZH::Remix;
 use v5.10;
-our $VERSION = "0.94";
+our $VERSION = "0.95";
 
 =pod
 
@@ -221,7 +221,9 @@ sub random_sentence {
     my $l = length($ending);
 
     my $max_iterations = 1000;
-    while ($l < ( $options{min} || 0 ) ) {
+    my $soft_min = $options{min} + int(rand($options{max} - $options{min}));
+
+    while ($l < $soft_min) {
         my $x;
         do {
             $x = random('，', '」', '）', '/')
