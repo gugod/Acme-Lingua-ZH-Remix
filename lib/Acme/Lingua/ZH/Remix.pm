@@ -1,4 +1,5 @@
 package Acme::Lingua::ZH::Remix;
+use v5.10;
 our $VERSION = "0.91";
 
 =pod
@@ -166,30 +167,61 @@ sub random_phrase {
     return ${ random(@{ $self->phrases->{$type}||=[] }) };
 }
 
-=head2 random_sentence
+=head2 random_sentence( min => $min, max => $max )
 
-Instance method. Takes no arguments, returns a scalar.
+Instance method. Optionally takes "min" or "max" parameter as the constraint of
+sentence length (number of characters).
 
-The returned scalar is the generate sentence.
+Both min and max values are required to be integers greater or equal to
+zero. The value of max should be greater then the value of min. If any of these
+values are invalidate, it is treated as if they are not passed. That is, the
+generated sentence are constraint-less, and can be any length.
+
+The returned scalar is the generate sentence string of wide characters. (Which
+makes Encode::is_utf8 return true.)
 
 =cut
 
 sub random_sentence {
-    my $self = shift;
+    my ($self, %options) = @_;
+
+    for my $p (qw(min max)) {
+        my $x = $options{$p};
+        unless (defined($x) && int($x) eq $x && $x >= 0) {
+            delete $options{$p}
+        }
+    }
+
+    if (defined($options{max}) && defined($options{min}) && $options{max} < $options{min}) {
+        delete $options{max};
+        delete $options{min};
+    }
 
     my $str = "";
-    while($str eq "") {
-        my $x = random('，', '」', '）', '/');
-        $str .= $self->random_phrase($x) while rand() < $self->phrase_ratio($x);
-    }
+    my @phrases;
 
     my $ending = $self->random_phrase(random(qw/。 ！ ？/));
+    unshift @phrases, $ending;
 
-    unless($ending) {
-        $str =~ s/，$//;
-        $ending = "..." unless $str =~ /」$/;
-        $str =~ s/^「(.+)」$/$1/;
+    my $l = length($ending);
+
+    my $x = random('，', '」', '）', '/');
+    while (rand() < $self->phrase_ratio($x) && $l > ($options{min}||0)) {
+        my $p = $self->random_phrase($x);
+        if ($options{max}) {
+            if ($l + length($p) > $options{max}) {
+                last;
+            }
+        }
+
+        $x = random('，', '」', '）', '/');
+        push @phrases, $p;
+        $l += length($p);
     }
+
+    $str = join "", @phrases;
+    $str =~ s/，$//;
+    $str =~ s/^「(.+)」$/$1/;
 
     $str .= $ending;
 
