@@ -164,6 +164,7 @@ sub phrase_ratio {
 sub random_phrase {
     my $self = shift;
     my $type = shift;
+
     return ${ random(@{ $self->phrases->{$type}||=[] }) || \'' };
 }
 
@@ -174,8 +175,14 @@ sentence length (number of characters).
 
 Both min and max values are required to be integers greater or equal to
 zero. The value of max should be greater then the value of min. If any of these
-values are invalidate, it is treated as if they are not passed. That is, the
-generated sentence are constraint-less, and can be any length.
+values are invalidate, it is treated as if they are not passed.
+
+The default values of min, max are 0 and 140, respectively.
+
+The underneath algorithm is randomize, and needs indefinite time to generate the
+result, if it takes more then 1000 iterations, it aborts and return the results
+anyway, regardless the length constraint. This can happen when the lengths of
+phrases from corpus do no adds up to a value within the given range.
 
 The returned scalar is the generate sentence string of wide characters. (Which
 makes Encode::is_utf8 return true.)
@@ -197,25 +204,37 @@ sub random_sentence {
         delete $options{min};
     }
 
+    $options{min} ||= 0;
+    $options{max} ||= 140;
+
     my $str = "";
     my @phrases;
 
     my $ending = $self->random_phrase(random(qw/。 ！ ？/)) || "…";
+
+    while ( length($ending) > $options{max} ) {
+        $ending = $self->random_phrase(random(qw/。 ！ ？/)) || "…";
+    }
+
     unshift @phrases, $ending;
 
     my $l = length($ending);
-    my $x = random('，', '」', '）', '/');
-    while (rand() < $self->phrase_ratio($x) || $l < ( $options{min} || 0 ) ) {
+
+    my $max_iterations = 1000;
+    while ($l < ( $options{min} || 0 ) ) {
+        my $x;
+        do {
+            $x = random('，', '」', '）', '/')
+        } while ($self->phrase_ratio($x) == 0);
+
         my $p = $self->random_phrase($x);
-        if ($options{max}) {
-            if ($l + length($p) > $options{max}) {
-                last;
-            }
+
+        if ($l + length($p) < $options{max}) {
+            unshift @phrases, $p;
+            $l += length($p);
         }
 
-        $x = random('，', '」', '）', '/');
-        unshift @phrases, $p;
-        $l += length($p);
+        last if ($max_iterations-- < 0);
     }
 
     $str = join "", @phrases;
