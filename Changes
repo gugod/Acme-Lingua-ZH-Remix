@@ -1,3 +1,6 @@
+0.96:
+- Try to be faster by adding fuzzy exit conditions.
+
 0.95:
 - improve: range_sentence does not stop generating when the sentance length just passes the lower-bound.
 
