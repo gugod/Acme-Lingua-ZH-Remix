@@ -6,13 +6,14 @@ use Acme::Lingua::ZH::Remix;
 
 my $r = Acme::Lingua::ZH::Remix->new;
 
+my ($min, $max) = (5, 8);
+
 for (1..100) {
-    my $s = $r->random_sentence(min => 5, max => 8);
+    my $s = $r->random_sentence(min => $min, max => $max);
     my $l = length($s);
 
     utf8::encode($s);
-    ok $s, "something is generated: $s";
-    ok($l >= 5 && $l <= 8, "length constrain: 5 <= $l <= 8 $s");
+    ok($l >= $min && $l <= $max, "length: $min <= $l <= $max");
 }
 
 

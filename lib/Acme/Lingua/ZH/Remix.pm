@@ -179,10 +179,10 @@ values are invalidate, it is treated as if they are not passed.
 
 The default values of min, max are 0 and 140, respectively.
 
-The underneath algorithm is randomize, and needs indefinite time to generate the
-result, if it takes more then 1000 iterations, it aborts and return the results
-anyway, regardless the length constraint. This can happen when the lengths of
-phrases from corpus do no adds up to a value within the given range.
+The implementation random algorthm based, thus it needs indefinite time to
+generate the result. If it takes more then 1000 iterations, it aborts and return
+the results anyway, regardless the length constraint. This can happen when the
+lengths of phrases from corpus do no adds up to a value within the given range.
 
 The returned scalar is the generate sentence string of wide characters. (Which
 makes Encode::is_utf8 return true.)
@@ -220,10 +220,12 @@ sub random_sentence {
 
     my $l = length($ending);
 
+    my $iterations = 0;
     my $max_iterations = 1000;
-    my $soft_min = $options{min} + int(rand($options{max} - $options{min}));
+    my $average = ($options{min} + $options{max}) / 2;
+    my $desired = int(rand($options{max} + 1 - $options{min}) + $options{min});
 
-    while ($l < $soft_min) {
+    while ($iterations++ < $max_iterations) {
         my $x;
         do {
             $x = random('，', '」', '）', '/')
@@ -236,7 +238,9 @@ sub random_sentence {
             $l += length($p);
         }
 
-        last if ($max_iterations-- < 0);
+        my $r = abs(1 - $l/$desired);
+        last if $r < 0.1;
+        last if $r < 0.2 && $iterations >= $max_iterations/2;
     }
 
     $str = join "", @phrases;
@@ -256,7 +260,7 @@ sub random_sentence {
 
 =head1 COPYRIGHT
 
-Copyright 2010 by Kang-min Liu, <gugod@gugod.org>
+Copyright 2010,2011,2012 by Kang-min Liu, <gugod@gugod.org>
 
 This program is free software; you can redistribute it a nd/or modify
 it under the same terms as Perl itself.
