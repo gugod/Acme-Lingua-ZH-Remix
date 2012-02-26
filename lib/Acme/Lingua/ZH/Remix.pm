@@ -223,7 +223,7 @@ sub random_sentence {
     my $iterations = 0;
     my $max_iterations = 1000;
     my $average = ($options{min} + $options{max}) / 2;
-    my $desired = int(rand($options{max} + 1 - $options{min}) + $options{min});
+    my $desired = int(rand($options{max} - $options{min}) + $options{min}) || $average || $options{max};
 
     while ($iterations++ < $max_iterations) {
         my $x;
