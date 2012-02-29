@@ -11,6 +11,10 @@ requires
     'Any::Moose'      => 0.12,
     'List::MoreUtils' => 0;
 
+test_requires
+    'Test::More' => 0.98;
+
+
 license        'mit';
 repository     'http://github.com/gugod/Acme-Lingua-ZH-Remix.git';
 
