@@ -12,3 +12,8 @@ perl:
   - "5.28"
   - "5.29"
 before_install: cpanm --notest Module::Build::Tiny
+before_script:
+  - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
+  - source ~/travis-perl-helpers/init
+  - build-perl
+  - perl -V
