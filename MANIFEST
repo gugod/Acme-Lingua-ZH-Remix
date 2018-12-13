@@ -6,11 +6,11 @@ MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
-Makefile.PL
 README
 README.markdown
 cpanfile
 lib/Acme/Lingua/ZH/Remix.pm
+metamerge.json
 t/00-load.t
 t/01-simple.t
 t/02-oo.t

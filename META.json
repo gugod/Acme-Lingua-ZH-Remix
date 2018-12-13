@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-Lingua-ZH-Remix",
    "prereqs" : {
@@ -45,6 +45,18 @@
       }
    },
    "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Acme-Lingua-ZH-Remix/issues"
+      },
+      "homepage" : "https://github.com/gugod/Acme-Lingua-ZH-Remix",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gugod/Acme-Lingua-ZH-Remix.git",
+         "web" : "https://github.com/gugod/Acme-Lingua-ZH-Remix"
+      }
+   },
    "version" : "0.96",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }
