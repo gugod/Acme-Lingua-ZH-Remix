@@ -8,8 +8,6 @@ install:
   - choco install strawberryperl
   - SET "PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%"
   - cpanm --quiet --installdeps --notest .
-  - cpanm --notest App::ModuleBuildTiny
-  - mbtiny regenerate
 test_script:
   - perl Build.PL
   - perl ./Build
